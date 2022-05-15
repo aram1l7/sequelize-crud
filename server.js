@@ -3,18 +3,16 @@ const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const models = require("./models/");
-
-const recipes = require("./routes/recipes");
-const ingredients = require("./routes/ingredients");
-
+const users = require("./routes/users");
+const movies = require("./routes/movies");
 const app = express();
 
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use("/recipes", recipes);
-app.use("/ingredients", ingredients);
+app.use("/api/users", users);
+app.use("/api/movies", movies);
 app.get("/", (req, res) => res.send("Hello world"));
 models.sequelize
   .authenticate()
