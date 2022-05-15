@@ -1,0 +1,136 @@
+const { Recipe, Ingredient, RecipeIngredient } = require("../models/");
+
+function index(req, res) {
+  Recipe.findAll({
+    include: [
+      {
+        model: Ingredient,
+        as: "ingredients",
+        attributes: ["name"],
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  })
+    .then((recipe) => {
+      return res.status(200).json(recipe);
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+}
+
+function create(req, res) {
+  Recipe.create({
+    title: req.body.title,
+    description: req.body.description,
+    instructions: req.body.instructions,
+  })
+    .then((recipe) => {
+      return res.status(200).json(recipe);
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+}
+
+function show(req, res) {
+  Recipe.findByPk(req.params.id, {
+    include: [
+      {
+        model: Ingredient,
+        as: "ingredients",
+        attributes: ["name"],
+        through: {
+          attributes: ["meassurementAmount", "meassurementType"],
+        },
+      },
+    ],
+  })
+    .then((recipe) => {
+      if (!recipe) {
+        return res.status(404).json({ message: "Recipe Not Found" });
+      }
+
+      return res.status(200).json(recipe);
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+}
+
+function update(req, res) {
+  Recipe.findByPk(req.params.id)
+    .then((recipe) => {
+      if (!recipe) {
+        return res.status(404).json({ message: "Recipe Not Found" });
+      }
+
+      recipe
+        .update({
+          ...recipe, //spread out existing recipe
+          ...req.body, //spread out req.body - the differences in the body will override the recipe returned from DB.
+        })
+        .then((recipe) => {
+          res.status(200).json(recipe);
+        })
+        .catch((error) => {
+          res.status(400).json(error);
+        });
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+}
+
+const destroy = async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id);
+    if (!recipe) {
+      return res.status(400).json({ message: "Recipe Not Found" });
+    }
+    await RecipeIngredient.destroy({
+      where: { recipeId: req.params.id },
+    });
+    await recipe.destroy();
+    res.status(200).json(recipe);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+function addIngredientToRecipe(req, res) {
+  Recipe.findByPk(req.params.recipeId)
+    .then((recipe) => {
+      if (!recipe) {
+        return res.status(400).json({ message: "Recipe Not Found" });
+      }
+
+      recipe
+        .addIngredient(req.params.ingredientId, {
+          through: {
+            meassurementAmount: req.body.meassurementAmount,
+            meassurementType: req.body.meassurementType,
+          },
+        })
+        .then((response) => {
+          return res.status(200).json(response);
+        })
+        .catch((error) => {
+          return res.status(400).json(error);
+        });
+    })
+    .catch((error) => {
+      return res.status(400).json(error);
+    });
+}
+
+module.exports = {
+  index,
+  create,
+  show,
+  update,
+  destroy,
+  addIngredientToRecipe,
+};
