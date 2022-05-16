@@ -1,24 +1,19 @@
 ("use strict");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Movie extends Model {
+  class Season extends Model {
     static associate(models) {
-      this.belongsToMany(models.User, {
-        through: "user_movies",
-        foreignKey: "movie_id",
-        as: "users",
-        onDelete: "cascade",
-      });
-      this.hasMany(models.Season, {
+      this.belongsTo(models.Movie, {
         foreignKey: {
           name: "movie_id",
           allowNull: false,
         },
         as: "seasons",
+        onDelete: "cascade",
       });
     }
   }
-  Movie.init(
+  Season.init(
     {
       title: {
         type: DataTypes.STRING,
@@ -28,12 +23,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      movie_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      tableName: "movies",
-      modelName: "Movie",
+      tableName: "seasons",
+      modelName: "Season",
     }
   );
-  return Movie;
+  return Season;
 };

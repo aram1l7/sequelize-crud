@@ -1,4 +1,4 @@
-const { UserMovies, Movie, User } = require("../models");
+const { UserMovies, Movie, User, Season } = require("../models");
 
 const getAll = async (req, res) => {
   try {
@@ -11,6 +11,11 @@ const getAll = async (req, res) => {
           through: {
             attributes: [],
           },
+        },
+        {
+          model: Season,
+          as: "seasons",
+          attributes: ["id", "title"],
         },
       ],
     });
@@ -35,7 +40,11 @@ const create = async (req, res) => {
 
 const show = async (req, res) => {
   try {
-    const movie = await Movie.findByPk(req.params.id);
+    const movie = await Movie.findByPk(req.params.id, {
+      include: [
+        { model: Season, as: "seasons", attributes: ["title", "description"] },
+      ],
+    });
     if (!movie) {
       return res.status(404).json({ message: "Movie not Found" });
     }
@@ -68,6 +77,9 @@ const destroy = async (req, res) => {
       return res.status(400).json({ message: "Movie Not Found" });
     }
     await UserMovies.destroy({
+      where: { movie_id: req.params.id },
+    });
+    await Season.destroy({
       where: { movie_id: req.params.id },
     });
     await movie.destroy();

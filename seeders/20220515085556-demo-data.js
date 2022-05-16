@@ -47,10 +47,35 @@ module.exports = {
       ],
       {}
     );
+    await queryInterface.bulkInsert(
+      "seasons",
+      [
+        {
+          title: "Season 1",
+          description: "lorem",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          title: "Season 2",
+          description: "ipsum",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          title: "Season 3",
+          description: "lorem ipsum",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      {}
+    );
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete("users", null, {});
     await queryInterface.bulkDelete("movies", null, {});
+    await queryInterface.bulkDelete("seasons", null, {});
   },
 };
