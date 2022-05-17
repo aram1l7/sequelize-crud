@@ -18,17 +18,23 @@ const create = async (req, res) => {
       },
     });
     let nextId = (+req.params.seasonId + 1).toString();
+    const episodeData = {
+      title: req.body.title,
+      about: req.body.about,
+    };
+    const currentSeason = await Season.findByPk(req.params.seasonId);
+    if (!currentSeason) {
+      return res.status(404).send("There is no season with entered id.Aborted");
+    }
     if (episodes.length > 22) {
       const nextSeason = await Season.findByPk(nextId);
       if (nextSeason) {
         const nextSeasonEpisode = await Episode.create({
-          title: req.body.title,
-          about: req.body.about,
+          ...episodeData,
           season_id: nextId,
         });
         return res.status(200).json(nextSeasonEpisode);
       }
-      const currentSeason = await Season.findByPk(req.params.seasonId);
       const movieId = currentSeason?.dataValues.movie_id;
       const newSzn = await Season.create({
         title: `Season ${nextId}`,
@@ -37,15 +43,13 @@ const create = async (req, res) => {
       });
       const newSeasonId = newSzn.dataValues.id;
       const newEpisode = await Episode.create({
-        title: req.body.title,
-        about: req.body.about,
+        ...episodeData,
         season_id: newSeasonId,
       });
       return res.status(200).json(newEpisode);
     }
     const new_episode = await Episode.create({
-      title: req.body.title,
-      about: req.body.about,
+      ...episodeData,
       season_id: req.params.seasonId,
     });
     return res.status(200).json(new_episode);
