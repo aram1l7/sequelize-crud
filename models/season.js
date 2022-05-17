@@ -11,6 +11,13 @@ module.exports = (sequelize, DataTypes) => {
         as: "seasons",
         onDelete: "cascade",
       });
+      this.hasMany(models.Episode, {
+        foreignKey: {
+          name: "season_id",
+          allowNull: false,
+        },
+        as: "episodes",
+      });
     }
   }
   Season.init(

@@ -1,8 +1,17 @@
-const { Season } = require("../models");
+const { Season, Episode } = require("../models");
 
 const getAll = async (req, res) => {
   try {
-    const seasons = await Season.findAll();
+    const seasons = await Season.findAll({
+      include: [
+        {
+          model: Episode,
+          as: "episodes",
+          attributes: ["title", "about"],
+        },
+      ],
+      order: [["id", "ASC"]],
+    });
     return res.status(200).json(seasons);
   } catch (error) {
     console.log(error);
