@@ -18,7 +18,7 @@ const create = async (req, res) => {
       },
     });
     let nextId = (+req.params.seasonId + 1).toString();
-    if (episodes.length >= 22) {
+    if (episodes.length > 22) {
       const nextSeason = await Season.findByPk(nextId);
       if (nextSeason) {
         const nextSeasonEpisode = await Episode.create({
