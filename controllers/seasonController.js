@@ -50,6 +50,11 @@ const update = async (req, res) => {
     if (!season) {
       return res.status(404).json({ message: "Season Not Found" });
     }
+    if (!req.body.title || !req.body.description) {
+      return res
+        .status(400)
+        .json("Cannot update season with empty title or description");
+    }
     await season.update({
       ...season,
       ...req.body,

@@ -26,7 +26,7 @@ const create = async (req, res) => {
     const newUser = await User.create({
       name: req.body.name,
     });
-    return res.status(200).json(newUser);
+    return res.status(201).json(newUser);
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -60,6 +60,9 @@ const update = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User Not Found" });
+    }
+    if (req.body.name.length < 1 || !req.body.name) {
+      return res.status(400).json("Updated name shouldnt be empty");
     }
     await user.update({
       ...user,
@@ -97,7 +100,7 @@ const subscribeToMovie = async (req, res) => {
       user_id: req.params.userId,
       movie_id: req.params.movieId,
     });
-    return res.status(200).json(user);
+    return res.status(201).json(user);
   } catch (error) {
     return res.status(400).json(error);
   }

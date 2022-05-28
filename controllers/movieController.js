@@ -32,7 +32,7 @@ const create = async (req, res) => {
       title: req.body.title,
       description: req.body.description,
     });
-    return res.status(200).json(newMovie);
+    return res.status(201).json(newMovie);
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -58,7 +58,12 @@ const update = async (req, res) => {
   try {
     const movie = await Movie.findByPk(req.params.id);
     if (!movie) {
-      return res.status(404).json({ message: "Movie Not Found" });
+      return res.status(400).json({ message: "Movie Not Found" });
+    }
+    if (!req.body.title || !req.body.description) {
+      return res
+        .status(400)
+        .json("Cannot update movie with empty title or description");
     }
     await movie.update({
       ...movie,

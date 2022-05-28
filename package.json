@@ -1,14 +1,21 @@
 {
-  "name": "sequelize--many-to-many",
+  "name": "backend",
   "version": "1.0.0",
-  "author": "William Pruden",
+  "author": "Aram",
   "scripts": {
-    "dev": "nodemon server"
+    "dev": "nodemon app",
+    "test": "jest"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./__test__/suiteSetup.js"
+    ]
   },
   "dependencies": {
     "body-parser": "^1.20.0",
     "cookie-parser": "^1.4.6",
     "debug": "^4.3.4",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "morgan": "^1.10.0",
     "pg": "^8.7.3",
@@ -20,6 +27,8 @@
     "swagger-ui-express": "^4.4.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.16"
+    "jest": "^28.1.0",
+    "nodemon": "^2.0.16",
+    "supertest": "^6.2.3"
   }
 }
