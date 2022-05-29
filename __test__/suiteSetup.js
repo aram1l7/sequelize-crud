@@ -1,5 +1,5 @@
-const models = require("../models");
+const db = require("../models");
 beforeAll(async () => {
-  await models.sequelize.sync({ force: true });
+  await db.sequelize.sync({ alter: true });
 });
-afterAll(() => models.sequelize.close());
+afterAll(() => db.sequelize.close());

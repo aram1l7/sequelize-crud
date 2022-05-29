@@ -22,7 +22,13 @@ const create = async (req, res) => {
       title: req.body.title,
       about: req.body.about,
     };
+    if (!req.body.title || !req.body.about) {
+      return res
+        .status(400)
+        .json("Cannot create an episode with empty title or about field");
+    }
     const currentSeason = await Season.findByPk(req.params.seasonId);
+
     if (!currentSeason) {
       return res.status(404).send("There is no season with entered id.Aborted");
     }
@@ -33,7 +39,7 @@ const create = async (req, res) => {
           ...episodeData,
           season_id: nextId,
         });
-        return res.status(200).json(nextSeasonEpisode);
+        return res.status(201).json(nextSeasonEpisode);
       }
       const movieId = currentSeason?.dataValues.movie_id;
       const newSzn = await Season.create({
@@ -46,13 +52,13 @@ const create = async (req, res) => {
         ...episodeData,
         season_id: newSeasonId,
       });
-      return res.status(200).json(newEpisode);
+      return res.status(201).json(newEpisode);
     }
     const new_episode = await Episode.create({
       ...episodeData,
       season_id: req.params.seasonId,
     });
-    return res.status(200).json(new_episode);
+    return res.status(201).json(new_episode);
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -75,6 +81,11 @@ const update = async (req, res) => {
     const episode = await Episode.findByPk(req.params.id);
     if (!episode) {
       return res.status(404).json({ message: "Episode Not Found" });
+    }
+    if (!req.body.title || !req.body.about) {
+      return res
+        .status(400)
+        .json("Cannot update episode with empty title or about field");
     }
     await episode.update({
       ...episode,

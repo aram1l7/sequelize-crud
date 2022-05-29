@@ -1,22 +1,23 @@
 const app = require("../app");
 const request = require("supertest");
-
+const createMovie = require("./mocks/createMovie");
 describe("movies", () => {
+  let movieMock = {};
+  beforeAll(async () => {
+    const movie = await createMovie();
+    movieMock = { ...movie.body };
+  });
   test("returns the list of all movies", async () => {
     const res = await request(app).get("/api/movies");
     expect(res.statusCode).toEqual(200);
   });
   test("gets movie by id", async () => {
-    const newMovie = await request(app).post("/api/movies").send({
-      title: "Test Movie 2",
-      description: "Lorem ipsum asdasd",
-    });
     await request(app)
-      .get(`/api/movies/${newMovie.body.id}`)
+      .get(`/api/movies/${movieMock.id}`)
       .expect(200)
       .then((res) => {
-        expect(res.body.id).toBe(newMovie.body.id);
-        expect(res.body.name).toBe(newMovie.body.name);
+        expect(res.body.id).toBe(movieMock.id);
+        expect(res.body.name).toBe(movieMock.name);
       });
   });
   test("creates a new movie", async () => {
@@ -43,29 +44,17 @@ describe("movies", () => {
     expect(res.statusCode).toEqual(400);
   });
   test("updates a movie", async () => {
-    const newMovie = await request(app).post("/api/movies").send({
-      title: "Test Movie 4",
-      description: "Hello world asdfasd",
+    const update = await request(app).put(`/api/movies/${movieMock.id}`).send({
+      title: "Asdfdsfsf",
+      description: "Lorem",
     });
-    const update = await request(app)
-      .put(`/api/movies/${newMovie.body.id}`)
-      .send({
-        title: "Asdfdsfsf",
-        description: "Lorem",
-      });
     expect(update.statusCode).toBe(200);
   });
   test("throws error if trying to update a movie with empty fields", async () => {
-    const newMovie = await request(app).post("/api/movies").send({
-      title: "Test Movie 5",
-      description: "Hello world asdfasd",
+    const update = await request(app).put(`/api/movies/${movieMock.id}`).send({
+      title: "",
+      description: "",
     });
-    const update = await request(app)
-      .put(`/api/movies/${newMovie.body.id}`)
-      .send({
-        title: "",
-        description: "",
-      });
     expect(update.statusCode).toBe(400);
     expect(JSON.parse(update.error.text)).toBe(
       "Cannot update movie with empty title or description"
@@ -82,12 +71,8 @@ describe("movies", () => {
       });
   });
   test("deletes a movie", async () => {
-    const newMovie = await request(app).post("/api/movies").send({
-      title: "Test Movie 6",
-      description: "Hello world asdfasd",
-    });
     await request(app)
-      .delete(`/api/movies/${newMovie.body.id}`)
+      .delete(`/api/movies/${movieMock.id}`)
       .then((res) => {
         expect(res.statusCode).toBe(200);
       });
