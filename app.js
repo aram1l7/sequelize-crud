@@ -10,6 +10,9 @@ const episodes = require("./routes/episodes");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const app = express();
+require("dotenv").config();
+const cors = require("cors");
+
 const port = process.env.PORT || 4000;
 const options = {
   definition: {
@@ -21,12 +24,19 @@ const options = {
     },
     servers: [
       {
+        url: "https://sequelize-crud.herokuapp.com",
+      },
+      {
         url: "http://localhost:4000",
       },
     ],
   },
   apis: ["./routes/*.js"],
 };
+app.use(
+  cors({ origin: "https://sequelize-crud.herokuapp.com", credentials: true })
+);
+
 const swaggerSpec = swaggerJsDoc(options);
 app.use(logger("dev"));
 app.use(bodyParser.json());
